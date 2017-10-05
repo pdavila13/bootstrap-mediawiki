@@ -61,7 +61,7 @@ $(function() {
 			$('.toc-sidebar').remove();
 			$('.wiki-body-section').removeClass('col-md-9').addClass('col-md-12');
 		} else {
-			$('.toc-sidebar').append('<h3>Contents</h3>');
+			$('.toc-sidebar').append('<h3>Contenido</h3>');
 			$('#toc').each(function() {
 				$(this).find('ul:first').appendTo( '.toc-sidebar' );
 				$(this).remove();
@@ -75,7 +75,7 @@ $(function() {
 			var $title = $toc.find('#toctitle');
 			var $links = $title.siblings('ul');
 
-			$('.page-header').prepend('<ul class="nav nav-pills pull-right"><li class="dropdown" id="page-contents"><a class="dropdown-toggle" data-toggle="dropdown"><i class="icon-list"></i> Contents <span class="caret"></span></a> <ul class="dropdown-menu"></ul></li></ul>');
+			$('.page-header').prepend('<ul class="nav nav-pills pull-right"><li class="dropdown" id="page-contents"><a class="dropdown-toggle" data-toggle="dropdown"><i class="icon-list"></i> Contenido <span class="caret"></span></a> <ul class="dropdown-menu"></ul></li></ul>');
 
 			$('.page-header #page-contents').find('.dropdown-menu').html( $links.html() );
 		});
@@ -100,7 +100,7 @@ $(function() {
 		}//end if
 	}//end if
 
-	prettyPrint();
+	//prettyPrint();
 
 	$('#wiki-body .body a[title="Special:UserLogin"]').click();
 	$('.dropdown-toggle').dropdown();
