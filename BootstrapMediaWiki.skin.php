@@ -107,18 +107,23 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-nav">
 							<li>
-							<a href="<?php echo $this->data['nav_urls']['mainpage']['href'] ?>">Home</a>
+							<a href="<?php echo $this->data['nav_urls']['mainpage']['href'] ?>"><i class="fa fa-home fa-fw"></i>&nbsp; Inicio</a>
 							</li>
 							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <span class="caret"></span></a>
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog fa-fw"></i>&nbsp; Herramientas<span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<li><a href="<?php echo $url_prefix; ?>Special:RecentChanges" class="recent-changes"><i class="fa fa-edit"></i> Recent Changes</a></li>
-									<li><a href="<?php echo $url_prefix; ?>Special:SpecialPages" class="special-pages"><i class="fa fa-star-o"></i> Special Pages</a></li>
+									<li><a href="<?php echo $url_prefix; ?>Special:RecentChanges" class="recent-changes"><i class="fa fa-edit"></i> Cambios recientes</a></li>
+									<li><a href="<?php echo $url_prefix; ?>Special:SpecialPages" class="special-pages"><i class="fa fa-star-o"></i> Páginas especiales</a></li>
 									<?php if ( $wgEnableUploads ) { ?>
-									<li><a href="<?php echo $url_prefix; ?>Special:Upload" class="upload-a-file"><i class="fa fa-upload"></i> Upload a File</a></li>
+									<li><a href="<?php echo $url_prefix; ?>Special:Upload" class="upload-a-file"><i class="fa fa-upload"></i> Subir archivo </a></li>
 									<?php } ?>
 								</ul>
 							</li>
+							
+							<?php  if ( $wgUser->isLoggedIn() ) : ?>
+								<li><a href="<?php echo $this->data['content_actions']['edit']['href'];?>"><i class="fa fa-pencil"></i> <?php echo wfMessage( 'edit')->text();?></a></li>
+							<?php endif; ?>
+
 							<?php echo $this->nav( $this->get_page_links( 'Bootstrap:TitleBar' ) ); ?>
 						</ul>
 					<?php
@@ -135,7 +140,7 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 						}//end if
 
 						if ( count( $this->data['content_actions']) > 0 ) {
-							$content_nav = $this->get_array_links( $this->data['content_actions'], 'Page', 'page' );
+							$content_nav = $this->get_array_links( $this->data['content_actions'], 'Página', 'page' );
 							?>
 							<ul class="nav navbar-nav navbar-right content-actions"><?php echo $content_nav; ?></ul>
 							<?php
@@ -152,7 +157,7 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 					?>
 					<form class="navbar-search navbar-form navbar-right" action="<?php $this->text( 'wgScript' ) ?>" id="searchform" role="search">
 						<div>
-							<input class="form-control" type="search" name="search" placeholder="Search" title="Search <?php echo $wgSitename; ?> [ctrl-option-f]" accesskey="f" id="searchInput" autocomplete="off">
+							<input class="form-control" type="search" name="search" placeholder="Buscar" title="Buscar <?php echo $wgSitename; ?> [ctrl-option-f]" accesskey="f" id="searchInput" autocomplete="off">
 							<input type="hidden" name="title" value="Special:Search">
 						</div>
 					</form>
@@ -210,7 +215,7 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 
 				<div class="pagetitle page-header">
 					<h1><?php $this->html( 'title' ) ?> <small><?php $this->html('subtitle') ?></small></h1>
-				</div>	
+				</div>
 
 				<div class="body">
 				<?php $this->html( 'bodytext' ) ?>
@@ -243,8 +248,8 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 			<div class="container">
 				<?php $this->includePage('Bootstrap:Footer'); ?>
 				<footer>
-					<p>&copy; <?php echo date('Y'); ?> by <a href="<?php echo (isset($wgCopyrightLink) ? $wgCopyrightLink : 'http://borkweb.com'); ?>"><?php echo (isset($wgCopyright) ? $wgCopyright : 'BorkWeb'); ?></a> 
-						&bull; Powered by <a href="http://mediawiki.org">MediaWiki</a> 
+					<p>&copy; <?php echo date('Y'); ?> by <a href="<?php echo (isset($wgCopyrightLink) ? $wgCopyrightLink : 'http://borkweb.com'); ?>"><?php echo (isset($wgCopyright) ? $wgCopyright : 'BorkWeb'); ?></a>
+						&bull; Powered by <a href="http://mediawiki.org">MediaWiki</a>
 					</p>
 				</footer>
 			</div><!-- container -->
@@ -407,7 +412,7 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 			}//end else
 		}
 
-		return $nav;	
+		return $nav;
 	}//end get_page_links
 
 	private function get_array_links( $array, $title, $which ) {
@@ -423,8 +428,60 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 				'title' => htmlspecialchars( $item['text'] ),
 			);
 
+			//DEBUG
+			//echo $key . " | " . $link['title'] . " # ";
+
 			if( 'page' == $which ) {
-				switch( $link['title'] ) {
+				switch( $key ) {
+				case 'nstab-main': $icon = 'file'; break;
+				case 'talk': $icon = 'comment'; break;
+				case 'edit': $icon = 'pencil'; break;
+				case 'history': $icon = 'clock-o'; break;
+				case 'delete': $icon = 'remove'; break;
+				case 'move': $icon = 'arrows'; break;
+				case 'protect': $icon = 'lock'; break;
+				case 'unprotect': $icon = 'unlock'; break;
+				case 'watch': $icon = 'eye-open'; break;
+				case 'unwatch': $icon = 'eye-slash'; break;
+				}//end switch
+
+				$link['title'] = '<i class="fa fa-' . $icon . '"></i> ' . $link['title'];
+			} elseif( 'user' == $which ) {
+				switch( $key ) {
+				case 'mytalk': $icon = 'comment'; break;
+				case 'preferences': $icon = 'cog'; break;
+				case 'watchlist': $icon = 'eye-slash'; break;
+				case 'mycontris': $icon = 'list-alt'; break;
+				case 'logout': $icon = 'power-off'; break;
+				default: $icon = 'user'; break;
+				}//end switch
+
+				$link['title'] = '<i class="fa fa-' . $icon . '"></i> ' . $link['title'];
+			}//end elseif
+
+			$nav[0]['sublinks'][] = $link;
+		}//end foreach
+
+		return $this->nav( $nav );
+	}//end get_array_links
+
+	/*
+	private function get_array_links( $array, $title, $which ) {
+		$nav = array();
+		$nav[] = array('title' => $title );
+		foreach( $array as $key => $item ) {
+			$link = array(
+				'id' => Sanitizer::escapeId( $key ),
+				'attributes' => $item['attributes'],
+				'link' => htmlspecialchars( $item['href'] ),
+				'key' => $item['key'],
+				'class' => htmlspecialchars( $item['class'] ),
+				'title' => htmlspecialchars( $item['text'] ),
+			);
+
+			if( 'page' == $which ) {
+				//switch( $link['title'] ) {
+				switch ( $key ) {
 				case 'Page': $icon = 'file'; break;
 				case 'Discussion': $icon = 'comment'; break;
 				case 'Edit': $icon = 'pencil'; break;
@@ -437,9 +494,11 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 				}//end switch
 
 				$link['title'] = '<i class="fa fa-' . $icon . '"></i> ' . $link['title'];
+
 			} elseif( 'user' == $which ) {
-				switch( $link['title'] ) {
-				case 'My talk': $icon = 'comment'; break;
+				//switch( $link['title'] ) {
+				switch( $key ) {
+				case 'My talk':  $icon = 'comment'; break;
 				case 'My preferences': $icon = 'cog'; break;
 				case 'My watchlist': $icon = 'eye-close'; break;
 				case 'My contributions': $icon = 'list-alt'; break;
@@ -447,7 +506,8 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 				default: $icon = 'user'; break;
 				}//end switch
 
-				$link['title'] = '<i class="fa fa-' . $icon . '"></i> ' . $link['title'];
+				//$link['title'] = '<i class="fa fa-' . $icon . '"></i> ' . $link['title'];
+				$link['title'] = '<i class="fa fa-' . $icon . '"></i>' . $link['title'];
 			}//end elseif
 
 			$nav[0]['sublinks'][] = $link;
@@ -455,6 +515,7 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 
 		return $this->nav( $nav );
 	}//end get_array_links
+	*/
 
 	function getPageRawText($title) {
 		global $wgParser, $wgUser;
@@ -475,7 +536,7 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 		global $wgParser, $wgUser;
 		$pageTitle = Title::newFromText($title);
 		if(!$pageTitle->exists()) {
-			echo 'The page [[' . $title . ']] was not found.';
+			echo 'La página [[' . $title . ']] no se encontro.';
 		} else {
 			$article = new Article($pageTitle);
 			$wgParserOptions = new ParserOptions($wgUser);
@@ -486,4 +547,3 @@ class BootstrapMediaWikiTemplate extends QuickTemplate {
 
 	public static function link() { }
 }
-
